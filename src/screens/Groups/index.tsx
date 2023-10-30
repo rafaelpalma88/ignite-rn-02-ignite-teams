@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FlatList } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 
 import { GroupCard } from '@components/GroupCard';
 import { Header } from '@components/Header';
@@ -10,15 +10,35 @@ import { ListEmpty } from '@components/ListEmpty';
 import { Button } from '@components/Button';
 
 import { Container } from './styles';
+import { findGroups } from '@storage/group/findGroups';
 
-export function Groups() {
+export function Groups(): React.JSX.Element {
   const [groups, setGroups] = useState<string[]>([]);
 
   const navigation = useNavigation()
 
-  function handleNewGroup() {
+  function handleNewGroup(): void {
     navigation.navigate('new')
   }
+
+  async function fetchGroups(): Promise<void> {
+    try {
+      const groups = await findGroups();
+      setGroups(groups);
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  function handleOpenGroup(group: string) {
+    navigation.navigate('players' , { group })
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchGroups()
+    }, [])
+  );
 
   return (
     <Container>
@@ -34,6 +54,7 @@ export function Groups() {
         renderItem={({ item }) => (
           <GroupCard 
             title={item} 
+            onPress={() => { handleOpenGroup(item); }}
           />
         )}
         contentContainerStyle={groups.length === 0 && { flex: 1 }}

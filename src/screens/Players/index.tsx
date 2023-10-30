@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList } from 'react-native'
+import { useRoute } from '@react-navigation/native'
 
 import { Header } from "@components/Header";
 import { Highlight } from "@components/Highlight";
@@ -12,16 +13,24 @@ import { Button } from '@components/Button';
 
 import { Container, Form, HeaderList, NumberOfPlayers } from "./styles";
 
-export function Players() {
+interface RouteParams {
+  group: string
+}
+
+export function Players(): React.JSX.Element {
   const [team, setTeam] = useState('Time A')
   const [players, setPlayers] = useState([])
+
+  const route = useRoute()
+   
+  const { group } = route.params as RouteParams
 
   return (
     <Container>
       <Header showBackButton />
 
       <Highlight 
-        title="Nome da turma"
+        title={group}
         subtitle="adicione a galera e separe os times"
       />
 
@@ -44,7 +53,7 @@ export function Players() {
             <Filter 
               title={item}
               isActive={item === team}
-              onPress={() => setTeam(item)}
+              onPress={() => { setTeam(item); }}
             />
           )}
           horizontal
