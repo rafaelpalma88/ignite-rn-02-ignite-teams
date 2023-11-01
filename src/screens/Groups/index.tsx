@@ -11,8 +11,10 @@ import { Button } from '@components/Button';
 
 import { Container } from './styles';
 import { findGroups } from '@storage/group/findGroups';
+import { Loading } from '@components/Loading';
 
 export function Groups(): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [groups, setGroups] = useState<string[]>([]);
 
   const navigation = useNavigation()
@@ -22,11 +24,14 @@ export function Groups(): React.JSX.Element {
   }
 
   async function fetchGroups(): Promise<void> {
+    setIsLoading(true)
     try {
       const groups = await findGroups();
       setGroups(groups);
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -48,20 +53,22 @@ export function Groups(): React.JSX.Element {
         subtitle="jogue com sua turma"
       />
 
-      <FlatList 
-        data={groups}
-        keyExtractor={item => item}
-        renderItem={({ item }) => (
-          <GroupCard 
-            title={item} 
-            onPress={() => { handleOpenGroup(item); }}
-          />
-        )}
-        contentContainerStyle={groups.length === 0 && { flex: 1 }}
-        ListEmptyComponent={() => (
-          <ListEmpty message="Que tal cadastrar a primeira turma?" />
-        )}
-      />
+      {isLoading ? (<Loading />) : (
+        <FlatList 
+          data={groups}
+          keyExtractor={item => item}
+          renderItem={({ item }) => (
+            <GroupCard 
+              title={item} 
+              onPress={() => { handleOpenGroup(item); }}
+            />
+          )}
+          contentContainerStyle={groups.length === 0 && { flex: 1 }}
+          ListEmptyComponent={() => (
+            <ListEmpty message="Que tal cadastrar a primeira turma?" />
+          )}
+        />
+      )}
 
       <Button 
         title='Criar nova turma'

@@ -7,6 +7,9 @@ export async function findGroups(): Promise<string[]> {
 
     const groups: string[] = storage ? JSON.parse(storage) : [];
 
+    // Simular um atraso de 20 segundos
+    // await new Promise((resolve) => setTimeout(resolve, 20000));
+
     return groups;
   } catch (error) {
     throw error;
